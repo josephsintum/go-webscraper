@@ -78,8 +78,8 @@ func main() {
 				FormType: "FormSite",
 			}
 
-		// check if link contains form in title
-		case strings.Contains(e.Text, "form"):
+		// check if link contains form in title or link
+		case strings.Contains(e.Text, "form") || strings.Contains(url, "form"):
 			if !strings.Contains(url, "://") {
 				url = "https://www.sjcc.edu" + url
 			}
