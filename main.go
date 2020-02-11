@@ -13,7 +13,7 @@ type Link struct {
 	URL      string
 	Origin   string
 	FormType string
-} 
+}
 
 func main() {
 	c := colly.NewCollector(
@@ -78,7 +78,7 @@ func main() {
 				FormType: "FormSite",
 			}
 
-		// TODO add a case for smartsheet forms
+		// ? query for smartsheets
 		case strings.Contains(url, "smartsheet.com/b/form"):
 			links["https://www.sjcc.edu"+url] = Link{
 				Title:    e.Text,
@@ -87,18 +87,27 @@ func main() {
 				FormType: "SmartSheets",
 			}
 
-		// check if link contains form in title or link
-		// ! refine query for "form" as word not substring
-		// case strings.Contains(e.Text, "form") || strings.Contains(url, "form"):
-		// 	if !strings.Contains(url, "://") {
-		// 		url = "https://www.sjcc.edu" + url
-		// 	}
-		// 	links["https://www.sjcc.edu"+url] = Link{
-		// 		Title:    e.Text,
-		// 		URL:      url,
-		// 		Origin:   currentPage,
-		// 		FormType: "Form",
-		// 	}
+		// ? query for docusign
+		case strings.Contains(url, "docusign.net/Member/PowerFormSigning.aspx"):
+			links["https://www.sjcc.edu"+url] = Link{
+				Title:    e.Text,
+				URL:      url,
+				Origin:   currentPage,
+				FormType: "DocuSign",
+			}
+
+			// check if link contains form in title or link
+			// ! refine query for "form" as word not substring
+			// case strings.Contains(e.Text, "form") || strings.Contains(url, "form"):
+			// 	if !strings.Contains(url, "://") {
+			// 		url = "https://www.sjcc.edu" + url
+			// 	}
+			// 	links["https://www.sjcc.edu"+url] = Link{
+			// 		Title:    e.Text,
+			// 		URL:      url,
+			// 		Origin:   currentPage,
+			// 		FormType: "Form",
+			// 	}
 		}
 
 		// Print link
@@ -125,8 +134,8 @@ func main() {
 	// TODO print as CSV format
 	// TODO remove origin link
 	for _, record := range links {
-		fmt.Println(record)
+		fmt.Println(record.Title, "*", record.URL, "*", record.FormType, "*", record.Origin)
 	}
-	
+
 	// fmt.Printf("%v \n", links)
 }
