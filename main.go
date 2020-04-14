@@ -25,7 +25,6 @@ func main() {
 	)
 
 	links := make(map[string]Link)
-	var currentPage string
 
 	links["0"] = Link{
 		Title:    "Title",
@@ -47,16 +46,16 @@ func main() {
 			links["https://www.sjcc.edu"+url] = Link{
 				Title:    e.Text,
 				URL:      url,
-				Origin:   currentPage,
+				Origin:   e.Request.URL.String(),
 				FormType: "PDF",
 			}
 
 		// ? query for Google Forms
-		case (strings.Contains(url, "docs.google.com/forms") || strings.Contains(url, "goo.gl/forms")):
+		case strings.Contains(url, "docs.google.com/forms") || strings.Contains(url, "goo.gl/forms"):
 			links["https://www.sjcc.edu"+url] = Link{
 				Title:    e.Text,
 				URL:      url,
-				Origin:   currentPage,
+				Origin:   e.Request.URL.String(),
 				FormType: "Google Docs",
 			}
 
@@ -65,7 +64,7 @@ func main() {
 			links["https://www.sjcc.edu"+url] = Link{
 				Title:    e.Text,
 				URL:      url,
-				Origin:   currentPage,
+				Origin:   e.Request.URL.String(),
 				FormType: "Office Forms",
 			}
 
@@ -74,7 +73,7 @@ func main() {
 			links["https://www.sjcc.edu"+url] = Link{
 				Title:    e.Text,
 				URL:      url,
-				Origin:   currentPage,
+				Origin:   e.Request.URL.String(),
 				FormType: "FormSite",
 			}
 
@@ -83,7 +82,7 @@ func main() {
 			links["https://www.sjcc.edu"+url] = Link{
 				Title:    e.Text,
 				URL:      url,
-				Origin:   currentPage,
+				Origin:   e.Request.URL.String(),
 				FormType: "SmartSheets",
 			}
 
@@ -92,35 +91,19 @@ func main() {
 			links["https://www.sjcc.edu"+url] = Link{
 				Title:    e.Text,
 				URL:      url,
-				Origin:   currentPage,
+				Origin:   e.Request.URL.String(),
 				FormType: "DocuSign",
 			}
 
-			// check if link contains form in title or link
-			// ! refine query for "form" as word not substring
-			// case strings.Contains(e.Text, "form") || strings.Contains(url, "form"):
-			// 	if !strings.Contains(url, "://") {
-			// 		url = "https://www.sjcc.edu" + url
-			// 	}
-			// 	links["https://www.sjcc.edu"+url] = Link{
-			// 		Title:    e.Text,
-			// 		URL:      url,
-			// 		Origin:   currentPage,
-			// 		FormType: "Form",
-			// 	}
 		}
 
 		// Print link
 		// fmt.Printf("Link found: %q -> %s\n", e.Text, url)
 		// Visit link found on page
 		// Only those links are visited which are in Allowed Domains
-		c.Visit(e.Request.AbsoluteURL(url))
-	})
-
-	// Before making a request
-	c.OnRequest(func(r *colly.Request) {
-		// fmt.Println("Visiting", r.URL.String())
-		currentPage = r.URL.String()
+		err := c.Visit(e.Request.AbsoluteURL(url))
+		if err != nil {
+		}
 	})
 
 	// ! Set error handling
@@ -129,12 +112,14 @@ func main() {
 	// })
 
 	// start scraping
-	c.Visit("http://www.sjcc.edu")
+	err := c.Visit("http://www.sjcc.edu")
+	if err != nil {
+	}
 
 	// TODO print as CSV format
 	// TODO remove origin link
 	for _, record := range links {
-		fmt.Println(record.Title, "*", record.URL, "*", record.FormType, "*", record.Origin)
+		fmt.Println(record.Title, "\t", record.URL, "\t", record.FormType, "\t", record.Origin)
 	}
 
 	// fmt.Printf("%v \n", links)
