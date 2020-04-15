@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 	"strings"
 
+	//"github.com/josephsintum/go-webscraper/write.go"
 	"github.com/gocolly/colly"
 )
 
@@ -13,6 +15,21 @@ type Link struct {
 	URL      string
 	Origin   string
 	FormType string
+}
+
+func write(filename string, data string) {
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if _, err := file.WriteString(data); err != nil {
+		file.Close()
+		// ignore error; Write error takes precedence
+		log.Fatal(err)
+	}
+	if err := file.Close(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
@@ -116,11 +133,9 @@ func main() {
 	if err != nil {
 	}
 
-	// TODO print as CSV format
-	// TODO remove origin link
 	for _, record := range links {
-		fmt.Println(record.Title, "\t", record.URL, "\t", record.FormType, "\t", record.Origin)
+		write("results.csv", record.Title+"\t"+record.URL+"\t"+record.FormType+"\t"+record.Origin+"\n")
 	}
 
-	// fmt.Printf("%v \n", links)
+	write("results.csv", "domino and sunlight")
 }
